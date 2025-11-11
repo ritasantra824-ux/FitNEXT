@@ -44,7 +44,9 @@ const Contact = () => {
           <Card className="p-6 text-center hover:border-primary transition-all">
             <Mail className="w-10 h-10 text-primary mx-auto mb-3" />
             <h3 className="font-bold mb-2">Email</h3>
-            <p className="text-sm text-muted-foreground">support@fitnext.com</p>
+            <p className="text-sm text-muted-foreground">aritkumarsantra.com
+
+          </p>
           </Card>
           
           
