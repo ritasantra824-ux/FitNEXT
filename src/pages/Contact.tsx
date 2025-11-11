@@ -49,7 +49,7 @@ const Contact = () => {
           
           
           
-          <Card className="p-6 text-center hover:border-primary transition-all">
+          <Card className="p-6 text-center hover:border-primary transition-all my-0 mx-[20px]">
             <MessageSquare className="w-10 h-10 text-primary mx-auto mb-3" />
             <h3 className="font-bold mb-2">Live Chat</h3>
             <p className="text-sm text-muted-foreground">Available 24/7</p>
