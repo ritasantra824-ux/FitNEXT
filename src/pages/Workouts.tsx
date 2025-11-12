@@ -294,23 +294,29 @@ const WorkoutContent = ({
               ? "Perfect for starting your fitness journey with manageable exercises"
               : "Challenge yourself with longer holds and more repetitions"}
           </p>
-          <ul className="space-y-2 mb-6">
+          <ul className="space-y-3 mb-6">
             {exercises.map((exercise, index) => (
-              <li key={index} className="flex items-center justify-between gap-2 text-sm">
-                <div className="flex items-center gap-2">
+              <li key={index} className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2 text-sm">
                   <span className="text-primary">•</span>
                   <span className="font-medium">{exercise.name}</span>
                   <span className="text-muted-foreground">- {exercise.reps}</span>
                 </div>
-                <a
-                  href={exercise.tutorialUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="h-8 gap-1.5"
                 >
-                  <Youtube className="w-4 h-4" />
-                  Tutorial
-                </a>
+                  <a
+                    href={exercise.tutorialUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Youtube className="w-4 h-4" />
+                    Tutorial
+                  </a>
+                </Button>
               </li>
             ))}
           </ul>
@@ -371,15 +377,21 @@ const WorkoutContent = ({
         <div className="text-center">
           <h3 className="text-3xl font-bold mb-2">{currentExercise.name}</h3>
           <p className="text-muted-foreground text-lg mb-4">{currentExercise.reps}</p>
-          <a
-            href={currentExercise.tutorialUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-sm text-primary hover:underline mb-6"
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="mb-6 gap-2"
           >
-            <Youtube className="w-5 h-5" />
-            Watch Tutorial
-          </a>
+            <a
+              href={currentExercise.tutorialUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Youtube className="w-4 h-4" />
+              Watch Tutorial
+            </a>
+          </Button>
           
           <div className="text-7xl font-bold text-primary mb-8">
             {formatTime(timeLeft)}
@@ -443,15 +455,21 @@ const WorkoutContent = ({
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <a
-                  href={exercise.tutorialUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="h-8 gap-1.5"
                 >
-                  <Youtube className="w-4 h-4" />
-                  Tutorial
-                </a>
+                  <a
+                    href={exercise.tutorialUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Youtube className="w-4 h-4" />
+                    Tutorial
+                  </a>
+                </Button>
                 {index === currentIndex && (
                   <span className="text-xs font-medium text-primary ml-2">Current</span>
                 )}
