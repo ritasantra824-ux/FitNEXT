@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Dumbbell, Play, Pause, RotateCcw, CheckCircle2, Zap, Coffee, Youtube } from "lucide-react";
 import { useWorkoutTracking } from "@/hooks/useWorkoutTracking";
 import { WorkoutHistory } from "@/components/WorkoutHistory";
@@ -15,17 +16,17 @@ interface Exercise {
 }
 
 const beginnerExercises: Exercise[] = [
-  { name: "Push-ups", reps: "5-10 reps", duration: 30, completed: false, tutorialUrl: "https://youtu.be/WDIpL0pjun0?si=prO_91tOEOwbHTkE" },
-  { name: "Squats", reps: "10-15 reps", duration: 40, completed: false, tutorialUrl: "https://youtu.be/iMlkdnZ_01k?si=svcqtkKAj_OnHmxN" },
-  { name: "Plank", reps: "10 sec hold", duration: 10, completed: false, tutorialUrl: "https://youtu.be/pvIjsG5Svck?si=XcD-hV1j6KSsC-Tb" },
-  { name: "Glute Bridges", reps: "10-12 reps", duration: 35, completed: false, tutorialUrl: "https://youtu.be/yJIyyubEawc?si=ZJ1XTuJkwSFVVPtS" },
+  { name: "Push-ups", reps: "5-10 reps", duration: 30, completed: false, tutorialUrl: "https://www.youtube.com/embed/WDIpL0pjun0" },
+  { name: "Squats", reps: "10-15 reps", duration: 40, completed: false, tutorialUrl: "https://www.youtube.com/embed/iMlkdnZ_01k" },
+  { name: "Plank", reps: "10 sec hold", duration: 10, completed: false, tutorialUrl: "https://www.youtube.com/embed/pvIjsG5Svck" },
+  { name: "Glute Bridges", reps: "10-12 reps", duration: 35, completed: false, tutorialUrl: "https://www.youtube.com/embed/yJIyyubEawc" },
 ];
 
 const advancedExercises: Exercise[] = [
-  { name: "Push-ups", reps: "15-20 reps", duration: 50, completed: false, tutorialUrl: "https://youtu.be/WDIpL0pjun0?si=prO_91tOEOwbHTkE" },
-  { name: "Squats", reps: "20-25 reps", duration: 60, completed: false, tutorialUrl: "https://youtu.be/iMlkdnZ_01k?si=svcqtkKAj_OnHmxN" },
-  { name: "Plank", reps: "30 sec hold", duration: 30, completed: false, tutorialUrl: "https://youtu.be/pvIjsG5Svck?si=XcD-hV1j6KSsC-Tb" },
-  { name: "Lunges", reps: "12-15 reps each leg", duration: 55, completed: false, tutorialUrl: "https://youtu.be/qbPLDFf9LfI?si=XEEPFFCGj5SBJcZF" },
+  { name: "Push-ups", reps: "15-20 reps", duration: 50, completed: false, tutorialUrl: "https://www.youtube.com/embed/WDIpL0pjun0" },
+  { name: "Squats", reps: "20-25 reps", duration: 60, completed: false, tutorialUrl: "https://www.youtube.com/embed/iMlkdnZ_01k" },
+  { name: "Plank", reps: "30 sec hold", duration: 30, completed: false, tutorialUrl: "https://www.youtube.com/embed/pvIjsG5Svck" },
+  { name: "Lunges", reps: "12-15 reps each leg", duration: 55, completed: false, tutorialUrl: "https://www.youtube.com/embed/qbPLDFf9LfI" },
 ];
 
 const Workouts = () => {
@@ -40,8 +41,23 @@ const Workouts = () => {
   const [workoutComplete, setWorkoutComplete] = useState(false);
   const [isResting, setIsResting] = useState(false);
   const [restTime, setRestTime] = useState(0);
+  const [videoModalOpen, setVideoModalOpen] = useState(false);
+  const [currentVideoUrl, setCurrentVideoUrl] = useState("");
+  const [currentVideoTitle, setCurrentVideoTitle] = useState("");
 
   const { workoutHistory, addWorkout, getWorkoutsThisWeek, hasWorkoutOnDate } = useWorkoutTracking();
+
+  const openVideoModal = (url: string, title: string) => {
+    setCurrentVideoUrl(url);
+    setCurrentVideoTitle(title);
+    setVideoModalOpen(true);
+  };
+
+  const closeVideoModal = () => {
+    setVideoModalOpen(false);
+    setCurrentVideoUrl("");
+    setCurrentVideoTitle("");
+  };
 
   const currentExercises = activeTab === "beginner" ? beginnerWorkout : advancedWorkout;
   const setCurrentExercises = activeTab === "beginner" ? setBeginnerWorkout : setAdvancedWorkout;
@@ -184,6 +200,24 @@ const Workouts = () => {
           </p>
         </div>
 
+        {/* Video Tutorial Modal */}
+        <Dialog open={videoModalOpen} onOpenChange={setVideoModalOpen}>
+          <DialogContent className="max-w-4xl w-full">
+            <DialogHeader>
+              <DialogTitle>{currentVideoTitle} Tutorial</DialogTitle>
+            </DialogHeader>
+            <div className="relative w-full pt-[56.25%]">
+              <iframe
+                className="absolute top-0 left-0 w-full h-full rounded-md"
+                src={currentVideoUrl}
+                title="YouTube video player"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
+
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
             <TabsTrigger value="beginner" className="flex items-center gap-2">
@@ -213,6 +247,7 @@ const Workouts = () => {
               onSkip={handleSkipExercise}
               formatTime={formatTime}
               level="Beginner"
+              onOpenVideo={openVideoModal}
             />
           </TabsContent>
 
@@ -233,6 +268,7 @@ const Workouts = () => {
               onSkip={handleSkipExercise}
               formatTime={formatTime}
               level="Advanced"
+              onOpenVideo={openVideoModal}
             />
           </TabsContent>
         </Tabs>
@@ -265,6 +301,7 @@ interface WorkoutContentProps {
   onSkip: () => void;
   formatTime: (seconds: number) => string;
   level: string;
+  onOpenVideo: (url: string, title: string) => void;
 }
 
 const WorkoutContent = ({
@@ -283,6 +320,7 @@ const WorkoutContent = ({
   onSkip,
   formatTime,
   level,
+  onOpenVideo,
 }: WorkoutContentProps) => {
   if (!workoutStarted) {
     return (
@@ -303,19 +341,13 @@ const WorkoutContent = ({
                   <span className="text-muted-foreground">- {exercise.reps}</span>
                 </div>
                 <Button
-                  asChild
                   variant="outline"
                   size="sm"
                   className="h-8 gap-1.5"
+                  onClick={() => onOpenVideo(exercise.tutorialUrl, exercise.name)}
                 >
-                  <a
-                    href={exercise.tutorialUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Youtube className="w-4 h-4" />
-                    Tutorial
-                  </a>
+                  <Youtube className="w-4 h-4" />
+                  Tutorial
                 </Button>
               </li>
             ))}
@@ -378,19 +410,13 @@ const WorkoutContent = ({
           <h3 className="text-3xl font-bold mb-2">{currentExercise.name}</h3>
           <p className="text-muted-foreground text-lg mb-4">{currentExercise.reps}</p>
           <Button
-            asChild
             variant="outline"
             size="sm"
             className="mb-6 gap-2"
+            onClick={() => onOpenVideo(currentExercise.tutorialUrl, currentExercise.name)}
           >
-            <a
-              href={currentExercise.tutorialUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Youtube className="w-4 h-4" />
-              Watch Tutorial
-            </a>
+            <Youtube className="w-4 h-4" />
+            Watch Tutorial
           </Button>
           
           <div className="text-7xl font-bold text-primary mb-8">
@@ -456,19 +482,13 @@ const WorkoutContent = ({
               </div>
               <div className="flex items-center gap-2">
                 <Button
-                  asChild
                   variant="outline"
                   size="sm"
                   className="h-8 gap-1.5"
+                  onClick={() => onOpenVideo(exercise.tutorialUrl, exercise.name)}
                 >
-                  <a
-                    href={exercise.tutorialUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Youtube className="w-4 h-4" />
-                    Tutorial
-                  </a>
+                  <Youtube className="w-4 h-4" />
+                  Tutorial
                 </Button>
                 {index === currentIndex && (
                   <span className="text-xs font-medium text-primary ml-2">Current</span>
