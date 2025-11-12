@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dumbbell, Play, Pause, RotateCcw, CheckCircle2, Zap } from "lucide-react";
+import { Dumbbell, Play, Pause, RotateCcw, CheckCircle2, Zap, Coffee } from "lucide-react";
+import { useWorkoutTracking } from "@/hooks/useWorkoutTracking";
+import { WorkoutHistory } from "@/components/WorkoutHistory";
 
 interface Exercise {
   name: string;
@@ -35,6 +37,10 @@ const Workouts = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [workoutStarted, setWorkoutStarted] = useState(false);
   const [workoutComplete, setWorkoutComplete] = useState(false);
+  const [isResting, setIsResting] = useState(false);
+  const [restTime, setRestTime] = useState(0);
+
+  const { workoutHistory, addWorkout, getWorkoutsThisWeek, hasWorkoutOnDate } = useWorkoutTracking();
 
   const currentExercises = activeTab === "beginner" ? beginnerWorkout : advancedWorkout;
   const setCurrentExercises = activeTab === "beginner" ? setBeginnerWorkout : setAdvancedWorkout;
@@ -42,22 +48,38 @@ const Workouts = () => {
   useEffect(() => {
     let interval: NodeJS.Timeout;
     
-    if (isRunning && timeLeft > 0) {
+    if (isRunning && timeLeft > 0 && !isResting) {
       interval = setInterval(() => {
         setTimeLeft((prev) => prev - 1);
       }, 1000);
-    } else if (timeLeft === 0 && isRunning) {
+    } else if (timeLeft === 0 && isRunning && !isResting) {
       handleCompleteExercise();
     }
 
     return () => clearInterval(interval);
-  }, [isRunning, timeLeft]);
+  }, [isRunning, timeLeft, isResting]);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    
+    if (isResting && restTime > 0) {
+      interval = setInterval(() => {
+        setRestTime((prev) => prev - 1);
+      }, 1000);
+    } else if (restTime === 0 && isResting) {
+      setIsResting(false);
+      setIsRunning(true);
+    }
+
+    return () => clearInterval(interval);
+  }, [isResting, restTime]);
 
   useEffect(() => {
     const allCompleted = currentExercises.every((ex) => ex.completed);
     if (allCompleted && workoutStarted) {
       setWorkoutComplete(true);
       setIsRunning(false);
+      addWorkout(activeTab);
     }
   }, [currentExercises, workoutStarted]);
 
@@ -87,11 +109,13 @@ const Workouts = () => {
     setCurrentExercises(updatedExercises);
     setIsRunning(false);
 
-    // Move to next exercise
+    // Move to next exercise with rest timer
     const nextIndex = currentIndex + 1;
     if (nextIndex < currentExercises.length) {
       setCurrentIndex(nextIndex);
       setTimeLeft(currentExercises[nextIndex].duration);
+      setIsResting(true);
+      setRestTime(20);
     }
   };
 
@@ -178,6 +202,8 @@ const Workouts = () => {
               timeLeft={timeLeft}
               isRunning={isRunning}
               workoutStarted={workoutStarted}
+              isResting={isResting}
+              restTime={restTime}
               onStart={handleStartWorkout}
               onPause={handlePause}
               onResume={handleResume}
@@ -196,6 +222,8 @@ const Workouts = () => {
               timeLeft={timeLeft}
               isRunning={isRunning}
               workoutStarted={workoutStarted}
+              isResting={isResting}
+              restTime={restTime}
               onStart={handleStartWorkout}
               onPause={handlePause}
               onResume={handleResume}
@@ -207,6 +235,14 @@ const Workouts = () => {
             />
           </TabsContent>
         </Tabs>
+
+        {/* Workout History Section */}
+        <div className="mt-12">
+          <WorkoutHistory 
+            workoutHistory={workoutHistory} 
+            workoutsThisWeek={getWorkoutsThisWeek()} 
+          />
+        </div>
       </div>
     </div>
   );
@@ -218,6 +254,8 @@ interface WorkoutContentProps {
   timeLeft: number;
   isRunning: boolean;
   workoutStarted: boolean;
+  isResting: boolean;
+  restTime: number;
   onStart: () => void;
   onPause: () => void;
   onResume: () => void;
@@ -234,6 +272,8 @@ const WorkoutContent = ({
   timeLeft,
   isRunning,
   workoutStarted,
+  isResting,
+  restTime,
   onStart,
   onPause,
   onResume,
@@ -272,6 +312,31 @@ const WorkoutContent = ({
   }
 
   const currentExercise = exercises[currentIndex];
+
+  // Show rest timer if resting
+  if (isResting) {
+    return (
+      <div className="space-y-6">
+        <Card className="p-8 border-secondary shadow-lg bg-gradient-to-br from-card to-secondary/10">
+          <div className="text-center">
+            <Coffee className="w-16 h-16 text-secondary mx-auto mb-4" />
+            <h3 className="text-3xl font-bold mb-2">Rest Time</h3>
+            <p className="text-muted-foreground text-lg mb-6">
+              Get ready for: {exercises[currentIndex].name}
+            </p>
+            
+            <div className="text-7xl font-bold text-secondary mb-8">
+              {formatTime(restTime)}
+            </div>
+
+            <p className="text-sm text-muted-foreground">
+              Next exercise will start automatically...
+            </p>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
