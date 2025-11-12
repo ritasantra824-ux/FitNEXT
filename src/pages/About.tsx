@@ -92,8 +92,11 @@ const About = () => {
 
         <Card className="p-8 mt-8 text-center">
           <h2 className="text-3xl font-bold mb-4">We Value Your Feedback</h2>
-          <p className="text-muted-foreground text-lg mb-6">
+          <p className="text-muted-foreground text-lg mb-4">
             Your suggestions help us improve and serve you better. Feel free to share your thoughts!
+          </p>
+          <p className="text-muted-foreground mb-6">
+            Email us at: <a href="mailto:aritkumarsantra@gmail.com" className="text-primary font-semibold hover:underline">aritkumarsantra@gmail.com</a>
           </p>
           <a
             href="mailto:aritkumarsantra@gmail.com?subject=FitNEXT Feedback"
