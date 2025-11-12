@@ -37,68 +37,53 @@ serve(async (req) => {
       );
     }
 
-    // Initialize Deno KV for rate limiting
-    const kv = await Deno.openKv();
-
-    // Check 60-second cooldown per phone number
-    const cooldownKey = ['otp_cooldown', phone];
-    const lastRequest = await kv.get(cooldownKey);
-
-    if (lastRequest.value) {
-      const timeSinceLastRequest = Date.now() - (lastRequest.value as number);
-      const cooldownMs = 60000; // 60 seconds
-      
-      if (timeSinceLastRequest < cooldownMs) {
-        const remainingSeconds = Math.ceil((cooldownMs - timeSinceLastRequest) / 1000);
-        console.log(`Rate limit hit for ${phone}. ${remainingSeconds}s remaining`);
-        return new Response(
-          JSON.stringify({ 
-            error: `Please wait ${remainingSeconds} seconds before requesting another OTP`,
-            retryAfter: remainingSeconds
-          }),
-          { 
-            status: 429, 
-            headers: { 
-              ...corsHeaders, 
-              'Content-Type': 'application/json',
-              'Retry-After': String(remainingSeconds)
-            } 
-          }
-        );
-      }
-    }
-
-    // Check hourly limit (5 requests max per hour)
-    const hourlyKey = ['otp_hourly', phone, new Date().toISOString().slice(0, 13)];
-    const hourlyCount = await kv.get(hourlyKey);
-
-    if (hourlyCount.value && (hourlyCount.value as number) >= 5) {
-      console.log(`Hourly limit exceeded for ${phone}`);
-      return new Response(
-        JSON.stringify({ 
-          error: 'Maximum OTP requests per hour exceeded. Please try again later.',
-          maxRetries: 5
-        }),
-        { 
-          status: 429, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
-    }
-
-    // Create Supabase client
+    // Create Supabase client for rate limiting
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-
+    
     if (!supabaseUrl || !supabaseServiceKey) {
-      console.error('Missing Supabase credentials');
-      return new Response(
-        JSON.stringify({ error: 'Server configuration error' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      throw new Error('Missing Supabase environment variables');
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Check 60-second cooldown
+    const { data: recentRequest } = await supabase
+      .from('otp_rate_limits')
+      .select('last_request_at')
+      .eq('phone', phone)
+      .gte('last_request_at', new Date(Date.now() - 60000).toISOString())
+      .single();
+
+    if (recentRequest) {
+      const timeSinceLastRequest = Date.now() - new Date(recentRequest.last_request_at).getTime();
+      const remainingSeconds = Math.ceil((60000 - timeSinceLastRequest) / 1000);
+      console.log(`Rate limit hit for ${phone}. ${remainingSeconds}s remaining`);
+      return new Response(
+        JSON.stringify({ 
+          error: `Please wait ${remainingSeconds} seconds before requesting another OTP`,
+          retryAfter: remainingSeconds
+        }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Check hourly limit (5 max)
+    const hourKey = new Date().toISOString().slice(0, 13);
+    const { data: hourlyData } = await supabase
+      .from('otp_rate_limits')
+      .select('request_count')
+      .eq('phone', phone)
+      .eq('hour_key', hourKey)
+      .single();
+
+    if (hourlyData && hourlyData.request_count >= 5) {
+      console.log(`Hourly limit exceeded for ${phone}`);
+      return new Response(
+        JSON.stringify({ error: 'Maximum OTP requests per hour exceeded. Please try again later.' }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     // Send OTP using Supabase Auth
     const { error } = await supabase.auth.signInWithOtp({
@@ -113,10 +98,15 @@ serve(async (req) => {
       );
     }
 
-    // Store rate limiting data after successful OTP send
-    await kv.set(cooldownKey, Date.now(), { expireIn: 60000 }); // 60 second expiry
-    const newCount = ((hourlyCount.value as number) || 0) + 1;
-    await kv.set(hourlyKey, newCount, { expireIn: 3600000 }); // 1 hour expiry
+    // Store rate limiting data
+    const newCount = (hourlyData?.request_count || 0) + 1;
+    
+    await supabase.from('otp_rate_limits').upsert({
+      phone,
+      request_count: newCount,
+      hour_key: hourKey,
+      last_request_at: new Date().toISOString()
+    }, { onConflict: 'phone,hour_key' });
 
     console.log(`OTP sent successfully to ${phone}. Count this hour: ${newCount}`);
 
