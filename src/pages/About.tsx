@@ -99,7 +99,7 @@ const About = () => {
             Email us at: <a href="mailto:aritkumarsantra@gmail.com" className="text-primary font-semibold hover:underline">aritkumarsantra@gmail.com</a>
           </p>
           <a
-            href="mailto:aritkumarsantra@gmail.com?subject=FitNEXT Feedback"
+            href="mailto:aritkumarsantra@gmail.com?subject=Website Feedback"
             className="inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8 text-lg font-semibold transition-colors"
           >
             Send Feedback
