@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dumbbell, Play, Pause, RotateCcw, CheckCircle2, Zap, Coffee } from "lucide-react";
+import { Dumbbell, Play, Pause, RotateCcw, CheckCircle2, Zap, Coffee, Youtube } from "lucide-react";
 import { useWorkoutTracking } from "@/hooks/useWorkoutTracking";
 import { WorkoutHistory } from "@/components/WorkoutHistory";
 
@@ -11,20 +11,21 @@ interface Exercise {
   reps: string;
   duration: number;
   completed: boolean;
+  tutorialUrl: string;
 }
 
 const beginnerExercises: Exercise[] = [
-  { name: "Push-ups", reps: "5-10 reps", duration: 30, completed: false },
-  { name: "Squats", reps: "10-15 reps", duration: 40, completed: false },
-  { name: "Plank", reps: "10 sec hold", duration: 10, completed: false },
-  { name: "Glute Bridges", reps: "10-12 reps", duration: 35, completed: false },
+  { name: "Push-ups", reps: "5-10 reps", duration: 30, completed: false, tutorialUrl: "https://youtu.be/WDIpL0pjun0?si=prO_91tOEOwbHTkE" },
+  { name: "Squats", reps: "10-15 reps", duration: 40, completed: false, tutorialUrl: "https://youtu.be/iMlkdnZ_01k?si=svcqtkKAj_OnHmxN" },
+  { name: "Plank", reps: "10 sec hold", duration: 10, completed: false, tutorialUrl: "https://youtu.be/pvIjsG5Svck?si=XcD-hV1j6KSsC-Tb" },
+  { name: "Glute Bridges", reps: "10-12 reps", duration: 35, completed: false, tutorialUrl: "https://youtu.be/yJIyyubEawc?si=ZJ1XTuJkwSFVVPtS" },
 ];
 
 const advancedExercises: Exercise[] = [
-  { name: "Push-ups", reps: "15-20 reps", duration: 50, completed: false },
-  { name: "Squats", reps: "20-25 reps", duration: 60, completed: false },
-  { name: "Plank", reps: "30 sec hold", duration: 30, completed: false },
-  { name: "Lunges", reps: "12-15 reps each leg", duration: 55, completed: false },
+  { name: "Push-ups", reps: "15-20 reps", duration: 50, completed: false, tutorialUrl: "https://youtu.be/WDIpL0pjun0?si=prO_91tOEOwbHTkE" },
+  { name: "Squats", reps: "20-25 reps", duration: 60, completed: false, tutorialUrl: "https://youtu.be/iMlkdnZ_01k?si=svcqtkKAj_OnHmxN" },
+  { name: "Plank", reps: "30 sec hold", duration: 30, completed: false, tutorialUrl: "https://youtu.be/pvIjsG5Svck?si=XcD-hV1j6KSsC-Tb" },
+  { name: "Lunges", reps: "12-15 reps each leg", duration: 55, completed: false, tutorialUrl: "https://youtu.be/qbPLDFf9LfI?si=XEEPFFCGj5SBJcZF" },
 ];
 
 const Workouts = () => {
@@ -295,10 +296,21 @@ const WorkoutContent = ({
           </p>
           <ul className="space-y-2 mb-6">
             {exercises.map((exercise, index) => (
-              <li key={index} className="flex items-center gap-2 text-sm">
-                <span className="text-primary">•</span>
-                <span className="font-medium">{exercise.name}</span>
-                <span className="text-muted-foreground">- {exercise.reps}</span>
+              <li key={index} className="flex items-center justify-between gap-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <span className="text-primary">•</span>
+                  <span className="font-medium">{exercise.name}</span>
+                  <span className="text-muted-foreground">- {exercise.reps}</span>
+                </div>
+                <a
+                  href={exercise.tutorialUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                >
+                  <Youtube className="w-4 h-4" />
+                  Tutorial
+                </a>
               </li>
             ))}
           </ul>
@@ -358,7 +370,16 @@ const WorkoutContent = ({
       <Card className="p-8 border-primary shadow-lg">
         <div className="text-center">
           <h3 className="text-3xl font-bold mb-2">{currentExercise.name}</h3>
-          <p className="text-muted-foreground text-lg mb-6">{currentExercise.reps}</p>
+          <p className="text-muted-foreground text-lg mb-4">{currentExercise.reps}</p>
+          <a
+            href={currentExercise.tutorialUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-sm text-primary hover:underline mb-6"
+          >
+            <Youtube className="w-5 h-5" />
+            Watch Tutorial
+          </a>
           
           <div className="text-7xl font-bold text-primary mb-8">
             {formatTime(timeLeft)}
@@ -421,9 +442,20 @@ const WorkoutContent = ({
                   <p className="text-sm text-muted-foreground">{exercise.reps}</p>
                 </div>
               </div>
-              {index === currentIndex && (
-                <span className="text-xs font-medium text-primary">Current</span>
-              )}
+              <div className="flex items-center gap-2">
+                <a
+                  href={exercise.tutorialUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                >
+                  <Youtube className="w-4 h-4" />
+                  Tutorial
+                </a>
+                {index === currentIndex && (
+                  <span className="text-xs font-medium text-primary ml-2">Current</span>
+                )}
+              </div>
             </div>
           </Card>
         ))}
