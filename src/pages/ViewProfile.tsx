@@ -4,13 +4,25 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Dumbbell, User, Calendar, Ruler, Weight } from "lucide-react";
+import { Dumbbell, User, Calendar, Ruler, Weight, Trash2 } from "lucide-react";
 import { format } from "date-fns";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const ViewProfile = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
   const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
@@ -50,6 +62,44 @@ const ViewProfile = () => {
 
     fetchProfile();
   }, [navigate, toast]);
+
+  const handleDeleteProfile = async () => {
+    setDeleting(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        navigate("/auth");
+        return;
+      }
+
+      const { error } = await supabase
+        .from("profiles")
+        .delete()
+        .eq("id", session.user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Profile Deleted",
+        description: "Your profile has been permanently deleted.",
+      });
+
+      // Sign out the user
+      await supabase.auth.signOut();
+      
+      // Redirect to auth page
+      navigate("/auth");
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -132,6 +182,38 @@ const ViewProfile = () => {
               >
                 Back to Home
               </Button>
+              
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="destructive"
+                    className="flex-1"
+                    disabled={deleting}
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete Profile
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete your
+                      profile and all associated data from our servers. You will be signed out
+                      and can create a fresh profile if you log in again.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleDeleteProfile}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      {deleting ? "Deleting..." : "Delete Profile"}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
         </Card>
