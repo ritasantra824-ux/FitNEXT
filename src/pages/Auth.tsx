@@ -20,19 +20,47 @@ const Auth = () => {
   const [resendTimer, setResendTimer] = useState(0);
 
   useEffect(() => {
-    // Check current session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Check current session and profile
+    const checkSessionAndProfile = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
+      
       if (session) {
-        navigate("/");
+        // Check if profile exists
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("id", session.user.id)
+          .maybeSingle();
+        
+        if (profile) {
+          navigate("/");
+        } else {
+          navigate("/setup-profile");
+        }
       }
-    });
+    };
+
+    checkSessionAndProfile();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       if (session) {
-        navigate("/");
+        // Defer profile check to avoid blocking auth state change
+        setTimeout(async () => {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("id")
+            .eq("id", session.user.id)
+            .maybeSingle();
+          
+          if (profile) {
+            navigate("/");
+          } else {
+            navigate("/setup-profile");
+          }
+        }, 0);
       }
     });
 
