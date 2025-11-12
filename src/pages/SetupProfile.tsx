@@ -11,6 +11,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Dumbbell, CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { z } from "zod";
+
+const profileSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
+  dob: z.date().max(new Date(), "Date of birth cannot be in the future").min(new Date("1900-01-01"), "Please enter a valid date"),
+  height: z.number().min(50, "Height must be at least 50 cm").max(300, "Height must be less than 300 cm").refine((val) => !isNaN(val) && isFinite(val), "Please enter a valid height"),
+  weight: z.number().min(20, "Weight must be at least 20 kg").max(500, "Weight must be less than 500 kg").refine((val) => !isNaN(val) && isFinite(val), "Please enter a valid weight"),
+});
 
 const SetupProfile = () => {
   const navigate = useNavigate();
@@ -66,12 +74,34 @@ const SetupProfile = () => {
         throw new Error("Not authenticated");
       }
 
+      // Parse and validate numeric values
+      const heightNum = parseFloat(height);
+      const weightNum = parseFloat(weight);
+
+      // Validate with zod schema
+      const validation = profileSchema.safeParse({
+        name,
+        dob,
+        height: heightNum,
+        weight: weightNum,
+      });
+
+      if (!validation.success) {
+        toast({
+          title: "Validation Error",
+          description: validation.error.errors[0].message,
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
       const { error } = await supabase.from("profiles").insert({
         id: session.user.id,
-        name,
-        dob: format(dob, "yyyy-MM-dd"),
-        height: parseFloat(height),
-        weight: parseFloat(weight),
+        name: validation.data.name,
+        dob: format(validation.data.dob, "yyyy-MM-dd"),
+        height: validation.data.height,
+        weight: validation.data.weight,
       });
 
       if (error) throw error;
@@ -116,6 +146,7 @@ const SetupProfile = () => {
                 placeholder="John Doe"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                maxLength={100}
                 required
                 className="mt-1"
               />

@@ -34,14 +34,25 @@ const AITrainer = () => {
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
-    const userMessage: Message = { role: "user", content: input };
+    // Client-side validation
+    const trimmedInput = input.trim();
+    if (trimmedInput.length > 2000) {
+      toast({
+        title: "Message too long",
+        description: "Please keep your message under 2000 characters.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const userMessage: Message = { role: "user", content: trimmedInput };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
 
     try {
       const { data, error } = await supabase.functions.invoke("ai-trainer", {
-        body: { message: input },
+        body: { message: trimmedInput },
       });
 
       if (error) {
@@ -56,9 +67,10 @@ const AITrainer = () => {
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error: any) {
       console.error("AI Trainer error:", error);
+      const errorMessage = error.message || "Failed to get response. Please try again.";
       toast({
         title: "Error",
-        description: "Failed to get response. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
