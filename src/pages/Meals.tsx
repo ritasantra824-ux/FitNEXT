@@ -229,6 +229,249 @@ const Meals = () => {
     },
   ];
 
+  const weightLossIndianMeals = [
+    {
+      meal: "Breakfast",
+      title: "Moong Dal Chilla",
+      calories: "280 kcal",
+      protein: "18g",
+      description: "Savory lentil pancake with vegetables, high in protein and fiber",
+      goal: "weightloss",
+      ingredients: [
+        "1 cup moong dal (yellow split lentils), soaked overnight",
+        "1/4 cup onion, finely chopped",
+        "1/4 cup tomato, finely chopped",
+        "2 green chilies, finely chopped",
+        "1/4 teaspoon turmeric powder",
+        "1/2 teaspoon cumin seeds",
+        "Salt to taste",
+        "Fresh coriander leaves, chopped",
+        "1 teaspoon oil for cooking"
+      ],
+      instructions: [
+        "Drain the soaked moong dal and grind to a smooth batter with minimal water",
+        "Add onion, tomato, green chilies, turmeric, cumin, salt, and coriander to the batter",
+        "Mix well to combine all ingredients",
+        "Heat a non-stick pan and lightly grease with oil",
+        "Pour a ladleful of batter and spread in circular motion to make a thin pancake",
+        "Cook on medium heat for 2-3 minutes until golden spots appear",
+        "Flip and cook the other side for 2 minutes",
+        "Serve hot with green chutney or low-fat yogurt"
+      ]
+    },
+    {
+      meal: "Lunch",
+      title: "Palak Chicken with Roti",
+      calories: "380 kcal",
+      protein: "38g",
+      description: "Spinach chicken curry with whole wheat roti, nutrient-dense and satisfying",
+      goal: "weightloss",
+      ingredients: [
+        "6 oz chicken breast, cubed",
+        "2 cups fresh spinach (palak), blanched and pureed",
+        "1 medium onion, finely chopped",
+        "2 tomatoes, pureed",
+        "2 cloves garlic, minced",
+        "1-inch ginger, grated",
+        "1/2 teaspoon garam masala",
+        "1/4 teaspoon turmeric powder",
+        "2 whole wheat rotis",
+        "1 tablespoon oil",
+        "Salt to taste"
+      ],
+      instructions: [
+        "Heat oil in a pan, add ginger-garlic paste and sauté until fragrant",
+        "Add onions and cook until golden brown",
+        "Add tomato puree, turmeric, garam masala, and salt",
+        "Cook masala until oil separates from the mixture",
+        "Add chicken pieces and cook for 5-7 minutes until sealed",
+        "Add spinach puree and mix well",
+        "Cover and simmer for 10-12 minutes until chicken is fully cooked",
+        "Serve hot with 2 whole wheat rotis"
+      ]
+    },
+    {
+      meal: "Dinner",
+      title: "Grilled Fish Tandoori",
+      calories: "350 kcal",
+      protein: "42g",
+      description: "Tandoori-spiced grilled fish with cucumber raita and salad",
+      goal: "weightloss",
+      ingredients: [
+        "6 oz white fish fillet (tilapia or pomfret)",
+        "1/4 cup low-fat yogurt",
+        "1 tablespoon tandoori masala",
+        "1 teaspoon lemon juice",
+        "1/2 teaspoon ginger-garlic paste",
+        "1 cucumber, grated for raita",
+        "2 tablespoons low-fat yogurt for raita",
+        "Mixed salad (lettuce, tomato, cucumber)",
+        "Salt to taste",
+        "Fresh coriander for garnish"
+      ],
+      instructions: [
+        "Mix yogurt, tandoori masala, lemon juice, ginger-garlic paste, and salt",
+        "Marinate fish fillets in this mixture for at least 30 minutes",
+        "Preheat grill or oven to 400°F (200°C)",
+        "Grill fish for 5-6 minutes on each side until cooked through and lightly charred",
+        "For raita, mix grated cucumber with yogurt, salt, and cumin powder",
+        "Serve grilled fish with raita and fresh mixed salad",
+        "Garnish with fresh coriander and lemon wedges"
+      ]
+    },
+    {
+      meal: "Snack",
+      title: "Masala Roasted Chana",
+      calories: "150 kcal",
+      protein: "8g",
+      description: "Spiced roasted chickpeas, crunchy and protein-rich snack",
+      goal: "weightloss",
+      ingredients: [
+        "1/2 cup roasted chickpeas (chana)",
+        "1/4 teaspoon chaat masala",
+        "1/4 teaspoon red chili powder",
+        "1/4 teaspoon cumin powder",
+        "Pinch of black salt",
+        "1 teaspoon lemon juice",
+        "Fresh coriander, chopped"
+      ],
+      instructions: [
+        "If using dried chickpeas, soak overnight and pressure cook until tender",
+        "Drain completely and pat dry with a kitchen towel",
+        "Roast chickpeas in a dry pan or oven at 350°F until crispy (15-20 minutes)",
+        "Transfer to a bowl and add all spices while still warm",
+        "Squeeze lemon juice over the chickpeas",
+        "Toss well to coat evenly with spices",
+        "Garnish with fresh coriander and enjoy as a crunchy snack"
+      ]
+    },
+  ];
+
+  const muscleGainIndianMeals = [
+    {
+      meal: "Breakfast",
+      title: "Paneer Paratha with Curd",
+      calories: "580 kcal",
+      protein: "28g",
+      description: "Stuffed whole wheat flatbread with cottage cheese, served with yogurt",
+      goal: "musclegain",
+      ingredients: [
+        "2 cups whole wheat flour",
+        "150g paneer, crumbled",
+        "1 onion, finely chopped",
+        "2 green chilies, chopped",
+        "1/2 teaspoon garam masala",
+        "Fresh coriander leaves, chopped",
+        "1 cup full-fat yogurt",
+        "2 tablespoons ghee for cooking",
+        "Salt to taste"
+      ],
+      instructions: [
+        "Mix whole wheat flour with water and knead into a soft dough",
+        "For filling, mix crumbled paneer, onion, green chilies, garam masala, coriander, and salt",
+        "Divide dough into equal portions and roll into small circles",
+        "Place paneer filling in the center and seal the edges",
+        "Roll out gently into a flatbread (paratha)",
+        "Heat a tawa/griddle and cook paratha on medium heat",
+        "Apply ghee on both sides and cook until golden brown spots appear",
+        "Serve hot with full-fat yogurt on the side"
+      ]
+    },
+    {
+      meal: "Lunch",
+      title: "Chicken Biryani with Raita",
+      calories: "720 kcal",
+      protein: "48g",
+      description: "Aromatic rice with spiced chicken, complete protein-rich meal",
+      goal: "musclegain",
+      ingredients: [
+        "6 oz chicken pieces with bone",
+        "1.5 cups basmati rice",
+        "1 cup yogurt",
+        "2 onions, sliced",
+        "2 tomatoes, chopped",
+        "2 tablespoons biryani masala",
+        "1/4 cup ghee",
+        "Whole spices (bay leaf, cardamom, cinnamon)",
+        "Saffron strands soaked in milk",
+        "Fresh mint and coriander leaves",
+        "Cucumber raita on the side"
+      ],
+      instructions: [
+        "Marinate chicken with yogurt, half the biryani masala, and salt for 30 minutes",
+        "Soak basmati rice for 20 minutes, then parboil with whole spices until 70% cooked",
+        "In a heavy-bottomed pan, heat ghee and fry sliced onions until golden brown",
+        "Remove half the onions for garnish, add tomatoes and remaining masala to the pan",
+        "Add marinated chicken and cook for 8-10 minutes",
+        "Layer parboiled rice over the chicken",
+        "Sprinkle fried onions, mint, coriander, and saffron milk on top",
+        "Cover with tight lid and cook on low heat (dum) for 20-25 minutes",
+        "Serve hot with cucumber raita"
+      ]
+    },
+    {
+      meal: "Dinner",
+      title: "Rajma Chawal with Paneer",
+      calories: "680 kcal",
+      protein: "42g",
+      description: "Kidney beans curry with rice and grilled cottage cheese",
+      goal: "musclegain",
+      ingredients: [
+        "1 cup rajma (kidney beans), soaked overnight",
+        "1 cup basmati rice",
+        "100g paneer, cubed and grilled",
+        "2 onions, finely chopped",
+        "2 tomatoes, pureed",
+        "1 tablespoon ginger-garlic paste",
+        "1 teaspoon cumin seeds",
+        "1 teaspoon garam masala",
+        "1/2 teaspoon red chili powder",
+        "2 tablespoons oil",
+        "Fresh coriander for garnish"
+      ],
+      instructions: [
+        "Pressure cook soaked rajma with salt until soft (3-4 whistles)",
+        "Cook basmati rice separately and keep aside",
+        "Heat oil in a pan, add cumin seeds and let them splutter",
+        "Add onions and cook until golden, then add ginger-garlic paste",
+        "Add tomato puree, red chili powder, and garam masala",
+        "Cook masala until oil separates",
+        "Add cooked rajma with some cooking water to achieve gravy consistency",
+        "Simmer for 10-15 minutes to develop flavors",
+        "Grill paneer cubes separately with minimal oil and spices",
+        "Serve rajma with rice, topped with grilled paneer and fresh coriander"
+      ]
+    },
+    {
+      meal: "Snack",
+      title: "Banana Almond Lassi",
+      calories: "420 kcal",
+      protein: "22g",
+      description: "Protein-rich yogurt smoothie with banana and almonds",
+      goal: "musclegain",
+      ingredients: [
+        "1.5 cups full-fat yogurt",
+        "1 ripe banana",
+        "10 almonds, soaked and peeled",
+        "2 tablespoons honey",
+        "1/4 teaspoon cardamom powder",
+        "1/2 cup milk",
+        "Ice cubes as needed",
+        "Chopped almonds for garnish"
+      ],
+      instructions: [
+        "Add yogurt, banana, soaked almonds, and milk to a blender",
+        "Add honey and cardamom powder",
+        "Blend on high speed until smooth and creamy",
+        "Add ice cubes and blend again for a chilled drink",
+        "Pour into a tall glass",
+        "Garnish with chopped almonds and a pinch of cardamom",
+        "Best consumed immediately after workout for muscle recovery",
+        "Can be refrigerated for up to 4 hours"
+      ]
+    },
+  ];
+
   const MealCard = ({ recipe }: any) => (
     <Card 
       className="p-6 hover:border-primary transition-all cursor-pointer"
@@ -271,7 +514,7 @@ const Meals = () => {
         </div>
 
         <Tabs defaultValue="weightloss" className="w-full">
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
+          <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-4 mb-8">
             <TabsTrigger value="weightloss" className="flex items-center gap-2">
               <TrendingDown className="w-4 h-4" />
               Weight Loss
@@ -279,6 +522,14 @@ const Meals = () => {
             <TabsTrigger value="musclegain" className="flex items-center gap-2">
               <TrendingUp className="w-4 h-4" />
               Muscle Gain
+            </TabsTrigger>
+            <TabsTrigger value="weightloss-indian" className="flex items-center gap-2">
+              <TrendingDown className="w-4 h-4" />
+              Indian Weight Loss
+            </TabsTrigger>
+            <TabsTrigger value="musclegain-indian" className="flex items-center gap-2">
+              <TrendingUp className="w-4 h-4" />
+              Indian Muscle Gain
             </TabsTrigger>
           </TabsList>
 
@@ -319,6 +570,48 @@ const Meals = () => {
             
             <div className="grid md:grid-cols-2 gap-6">
               {muscleGainMeals.map((meal, index) => (
+                <MealCard key={index} recipe={meal} />
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="weightloss-indian">
+            <div className="mb-6 p-6 bg-card rounded-lg">
+              <h2 className="text-2xl font-bold mb-2">Indian Weight Loss Plan</h2>
+              <p className="text-muted-foreground mb-4">
+                Daily target: 1,160 calories | Traditional Indian cuisine optimized for weight loss
+              </p>
+              <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                <li>Focus on dal, lean proteins, and vegetables</li>
+                <li>Moderate use of whole grains like roti and brown rice</li>
+                <li>Minimal oil and ghee</li>
+                <li>Rich in fiber and traditional spices for metabolism</li>
+              </ul>
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-6">
+              {weightLossIndianMeals.map((meal, index) => (
+                <MealCard key={index} recipe={meal} />
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="musclegain-indian">
+            <div className="mb-6 p-6 bg-card rounded-lg">
+              <h2 className="text-2xl font-bold mb-2">Indian Muscle Gain Plan</h2>
+              <p className="text-muted-foreground mb-4">
+                Daily target: 2,400+ calories | High-protein Indian meals for muscle building
+              </p>
+              <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                <li>Emphasis on paneer, chicken, fish, and legumes</li>
+                <li>Complex carbs from rice, rotis, and traditional grains</li>
+                <li>Healthy fats from ghee, nuts, and dairy</li>
+                <li>Protein-rich traditional preparations</li>
+              </ul>
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-6">
+              {muscleGainIndianMeals.map((meal, index) => (
                 <MealCard key={index} recipe={meal} />
               ))}
             </div>
