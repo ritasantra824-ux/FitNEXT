@@ -2,9 +2,28 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Activity, Apple, Dumbbell, MessageSquare } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import heroImage from "@/assets/hero-fitness.jpg";
 
 const Home = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+    };
+
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   const features = [
     {
       icon: Activity,
@@ -53,11 +72,13 @@ const Home = () => {
             Your personal fitness journey starts here with AI-powered coaching, custom meal plans, and expert workouts
           </p>
           <div className="flex gap-4 justify-center">
-            <Link to="/auth">
-              <Button size="lg" className="bg-gradient-primary hover:shadow-glow-green transition-all">
-                Get Started Free
-              </Button>
-            </Link>
+            {!isAuthenticated && (
+              <Link to="/auth">
+                <Button size="lg" className="bg-gradient-primary hover:shadow-glow-green transition-all">
+                  Get Started Free
+                </Button>
+              </Link>
+            )}
             <Link to="/about">
               <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary/10">
                 Learn More
@@ -100,11 +121,13 @@ const Home = () => {
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
             Join thousands of people achieving their fitness goals with FitNEXT
           </p>
-          <Link to="/auth">
-            <Button size="lg" variant="secondary" className="bg-fitness-orange hover:bg-fitness-orange/90">
-              Sign Up Now
-            </Button>
-          </Link>
+          {!isAuthenticated && (
+            <Link to="/auth">
+              <Button size="lg" variant="secondary" className="bg-fitness-orange hover:bg-fitness-orange/90">
+                Sign Up Now
+              </Button>
+            </Link>
+          )}
         </div>
       </section>
     </div>
