@@ -89,6 +89,19 @@ const About = () => {
             </p>
           </div>
         </Card>
+
+        <Card className="p-8 mt-8 text-center">
+          <h2 className="text-3xl font-bold mb-4">We Value Your Feedback</h2>
+          <p className="text-muted-foreground text-lg mb-6">
+            Your suggestions help us improve and serve you better. Feel free to share your thoughts!
+          </p>
+          <a
+            href="mailto:aritkumarsantra@gmail.com?subject=FitNEXT Feedback"
+            className="inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8 text-lg font-semibold transition-colors"
+          >
+            Send Feedback
+          </a>
+        </Card>
       </div>
     </div>
   );
