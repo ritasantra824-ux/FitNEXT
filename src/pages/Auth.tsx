@@ -153,6 +153,7 @@ const Auth = () => {
   };
 
   const handleSendOtp = async () => {
+    // Client-side pre-validation for immediate feedback
     if (mobile.length !== 13 || !mobile.startsWith("+91")) {
       toast({
         title: "Invalid Mobile Number",
@@ -165,11 +166,14 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        phone: mobile,
+      // Server-side validation via edge function
+      const { data, error } = await supabase.functions.invoke('send-otp', {
+        body: { phone: mobile },
       });
 
-      if (error) throw error;
+      if (error || !data?.success) {
+        throw new Error(data?.error || error?.message || "Failed to send OTP");
+      }
 
       setOtpSent(true);
       setResendTimer(30);
