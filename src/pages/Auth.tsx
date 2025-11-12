@@ -137,30 +137,22 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('send-otp', {
-        body: { mobile },
+      const { error } = await supabase.auth.signInWithOtp({
+        phone: mobile,
       });
 
       if (error) throw error;
 
-      if (data.success) {
-        setOtpSent(true);
-        setResendTimer(30);
-        toast({
-          title: "OTP Sent",
-          description: "Please check your mobile for the OTP",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: data.message || "Failed to send OTP",
-          variant: "destructive",
-        });
-      }
+      setOtpSent(true);
+      setResendTimer(30);
+      toast({
+        title: "OTP Sent",
+        description: "Please check your mobile for the OTP",
+      });
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message || "Failed to send OTP",
+        description: error.message || "Failed to send OTP. Please ensure phone auth is configured.",
         variant: "destructive",
       });
     } finally {
@@ -181,29 +173,23 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('verify-otp', {
-        body: { mobile, otp },
+      const { error } = await supabase.auth.verifyOtp({
+        phone: mobile,
+        token: otp,
+        type: 'sms',
       });
 
       if (error) throw error;
 
-      if (data.success) {
-        toast({
-          title: "Success!",
-          description: "OTP verified successfully. Redirecting...",
-        });
-        // The auth state change listener will handle navigation
-      } else {
-        toast({
-          title: "Verification Failed",
-          description: data.message || "Invalid OTP",
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "Success!",
+        description: "OTP verified successfully. Redirecting...",
+      });
+      // The auth state change listener will handle navigation
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: error.message || "Failed to verify OTP",
+        title: "Verification Failed",
+        description: error.message || "Invalid OTP",
         variant: "destructive",
       });
     } finally {
