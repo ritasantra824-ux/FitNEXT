@@ -4,6 +4,7 @@ import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const messageSchema = z.object({
   message: z.string().trim().min(1, "Message cannot be empty").max(2000, "Message must be less than 2000 characters"),
+  mode: z.enum(['general', 'meal-plan']).optional().default('general'),
 });
 
 const corsHeaders = {
@@ -31,12 +32,33 @@ serve(async (req) => {
       );
     }
 
-    const { message } = validation.data;
+    const { message, mode } = validation.data;
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
+
+    const systemPrompt = mode === 'meal-plan' 
+      ? `You are an expert AI nutritionist and meal planning specialist. Your role is to:
+- Ask about the user's daily calorie requirements or fitness goals (weight loss, maintenance, muscle gain)
+- Inquire about dietary preferences, restrictions, and allergies
+- Understand their preferred cuisine style
+- Create detailed, personalized meal plans with:
+  * Specific meals for breakfast, lunch, dinner, and snacks
+  * Calorie counts and macronutrient breakdown for each meal
+  * Easy-to-follow recipes with ingredients and instructions
+  * Daily totals that match their calorie targets
+
+Provide practical, science-based nutrition advice. Structure meal plans clearly with meals organized by day and time. Include variety and consider user preferences. Always remind users to consult healthcare professionals for medical dietary concerns.`
+      : `You are an expert AI fitness trainer. You provide helpful, motivating, and scientifically-backed advice on:
+- Workout routines and exercise form
+- Nutrition and meal planning
+- Weight loss and muscle gain strategies
+- Fitness motivation and goal setting
+- Recovery and injury prevention
+
+Keep responses concise, encouraging, and practical. Always remind users to consult healthcare professionals for medical concerns.`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -49,14 +71,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are an expert AI fitness trainer. You provide helpful, motivating, and scientifically-backed advice on:
-- Workout routines and exercise form
-- Nutrition and meal planning
-- Weight loss and muscle gain strategies
-- Fitness motivation and goal setting
-- Recovery and injury prevention
-
-Keep responses concise, encouraging, and practical. Always remind users to consult healthcare professionals for medical concerns.`
+            content: systemPrompt
           },
           {
             role: 'user',
