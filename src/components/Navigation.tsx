@@ -124,7 +124,7 @@ const Navigation = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Link to="/auth">
+              <Link to="/login">
                 <Button variant="default" className="ml-2">
                   Login
                 </Button>
@@ -184,7 +184,7 @@ const Navigation = () => {
                   </Button>
                 </>
               ) : (
-                <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
+                <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
                   <Button variant="default" className="w-full">
                     Login
                   </Button>

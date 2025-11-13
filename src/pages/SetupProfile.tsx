@@ -9,7 +9,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Dumbbell } from "lucide-react";
 import { z } from "zod";
-import AITrainer from "./AITrainer";
 
 const profileSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
@@ -24,7 +23,6 @@ const SetupProfile = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [profileCompleted, setProfileCompleted] = useState(false);
   const [name, setName] = useState("");
   const [day, setDay] = useState("");
   const [month, setMonth] = useState("");
@@ -145,11 +143,11 @@ const SetupProfile = () => {
 
       toast({
         title: "Profile Created!",
-        description: "Welcome to FitNEXT! You now have access to AI features.",
+        description: "Welcome to FitNEXT!",
       });
 
-      // Set profile completed to show AI features
-      setProfileCompleted(true);
+      // Navigate to home page
+      navigate("/");
     } catch (error: any) {
       toast({
         title: "Error",
@@ -161,10 +159,6 @@ const SetupProfile = () => {
     }
   };
 
-  // If profile is completed, show AI Trainer
-  if (profileCompleted) {
-    return <AITrainer />;
-  }
 
   return (
     <div className="min-h-screen pt-24 pb-12 px-4 flex items-center">
