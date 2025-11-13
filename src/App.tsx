@@ -3,9 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./contexts/AuthContext";
 import Navigation from "./components/Navigation";
-import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/Home";
 import BMI from "./pages/BMI";
 import Meals from "./pages/Meals";
@@ -29,30 +27,28 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <AuthProvider>
-          <Navigation />
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/auth/callback" element={<AuthCallback />} />
-            <Route path="/setup-profile" element={<SetupProfile />} />
-            
-            {/* Protected Routes */}
-            <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-            <Route path="/bmi" element={<ProtectedRoute><BMI /></ProtectedRoute>} />
-            <Route path="/meals" element={<ProtectedRoute><Meals /></ProtectedRoute>} />
-            <Route path="/recipe" element={<ProtectedRoute><RecipeDetail /></ProtectedRoute>} />
-            <Route path="/workouts" element={<ProtectedRoute><Workouts /></ProtectedRoute>} />
-            <Route path="/ai-trainer" element={<ProtectedRoute><AITrainer /></ProtectedRoute>} />
-            <Route path="/about" element={<ProtectedRoute><About /></ProtectedRoute>} />
-            <Route path="/contact" element={<ProtectedRoute><Contact /></ProtectedRoute>} />
-            <Route path="/view-profile" element={<ProtectedRoute><ViewProfile /></ProtectedRoute>} />
-            
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AuthProvider>
+        <Navigation />
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/setup-profile" element={<SetupProfile />} />
+          
+          {/* Open Access Routes */}
+          <Route path="/" element={<Home />} />
+          <Route path="/bmi" element={<BMI />} />
+          <Route path="/meals" element={<Meals />} />
+          <Route path="/recipe" element={<RecipeDetail />} />
+          <Route path="/workouts" element={<Workouts />} />
+          <Route path="/ai-trainer" element={<AITrainer />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/view-profile" element={<ViewProfile />} />
+          
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
