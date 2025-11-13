@@ -35,6 +35,7 @@ const App = () => (
           <Route path="/ai-trainer" element={<AITrainer />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/login" element={<Auth />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/setup-profile" element={<SetupProfile />} />
           <Route path="/view-profile" element={<ViewProfile />} />
