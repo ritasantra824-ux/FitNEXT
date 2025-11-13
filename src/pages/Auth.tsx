@@ -7,17 +7,13 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Dumbbell, Phone } from "lucide-react";
+import { Dumbbell } from "lucide-react";
 
 const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [session, setSession] = useState<any>(null);
-  const [mobile, setMobile] = useState("+91");
-  const [otp, setOtp] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
-  const [resendTimer, setResendTimer] = useState(0);
 
   useEffect(() => {
     // Check current session and profile
@@ -67,12 +63,6 @@ const Auth = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  useEffect(() => {
-    if (resendTimer > 0) {
-      const timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [resendTimer]);
 
   const handleEmailSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -152,88 +142,6 @@ const Auth = () => {
     }
   };
 
-  const handleSendOtp = async () => {
-    // Client-side pre-validation for immediate feedback
-    if (mobile.length !== 13 || !mobile.startsWith("+91")) {
-      toast({
-        title: "Invalid Mobile Number",
-        description: "Please enter a valid 10-digit Indian mobile number",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      // Server-side validation via edge function
-      const { data, error } = await supabase.functions.invoke('send-otp', {
-        body: { phone: mobile },
-      });
-
-      if (error || !data?.success) {
-        throw new Error(data?.error || error?.message || "Failed to send OTP");
-      }
-
-      setOtpSent(true);
-      setResendTimer(30);
-      toast({
-        title: "OTP Sent",
-        description: "Please check your mobile for the OTP",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to send OTP. Please ensure phone auth is configured.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyOtp = async () => {
-    if (!otp || otp.length < 4) {
-      toast({
-        title: "Invalid OTP",
-        description: "Please enter the OTP received on your mobile",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const { error } = await supabase.auth.verifyOtp({
-        phone: mobile,
-        token: otp,
-        type: 'sms',
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Success!",
-        description: "OTP verified successfully. Redirecting...",
-      });
-      // The auth state change listener will handle navigation
-    } catch (error: any) {
-      toast({
-        title: "Verification Failed",
-        description: error.message || "Invalid OTP",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleResendOtp = () => {
-    setOtp("");
-    setOtpSent(false);
-    handleSendOtp();
-  };
 
   return (
     <div className="min-h-screen pt-24 pb-12 px-4 flex items-center">
@@ -249,86 +157,12 @@ const Auth = () => {
         </div>
 
         <Card className="p-8">
-          <Tabs defaultValue="mobile" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-6">
-              <TabsTrigger value="mobile">Mobile</TabsTrigger>
+          <Tabs defaultValue="signin" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="signin">Sign In</TabsTrigger>
               <TabsTrigger value="signup">Sign Up</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="mobile">
-              <div className="space-y-4">
-                {!otpSent ? (
-                  <>
-                    <div>
-                      <Label htmlFor="mobile">Mobile Number</Label>
-                      <div className="flex items-center gap-2 mt-1">
-                        <Phone className="w-4 h-4 text-muted-foreground" />
-                        <Input
-                          id="mobile"
-                          type="tel"
-                          placeholder="+91XXXXXXXXXX"
-                          value={mobile}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            if (value.startsWith("+91") && value.length <= 13) {
-                              setMobile(value);
-                            }
-                          }}
-                          className="flex-1"
-                        />
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Enter your 10-digit mobile number
-                      </p>
-                    </div>
-                    <Button
-                      type="button"
-                      className="w-full bg-gradient-primary"
-                      onClick={handleSendOtp}
-                      disabled={loading || mobile.length !== 13}
-                    >
-                      {loading ? "Sending..." : "Send OTP"}
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <div>
-                      <Label htmlFor="otp">Enter OTP</Label>
-                      <Input
-                        id="otp"
-                        type="text"
-                        placeholder="Enter 6-digit OTP"
-                        value={otp}
-                        onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                        className="mt-1 text-center text-2xl tracking-widest"
-                        maxLength={6}
-                      />
-                      <p className="text-xs text-muted-foreground mt-1">
-                        OTP sent to {mobile}
-                      </p>
-                    </div>
-                    <Button
-                      type="button"
-                      className="w-full bg-gradient-primary"
-                      onClick={handleVerifyOtp}
-                      disabled={loading || otp.length < 4}
-                    >
-                      {loading ? "Verifying..." : "Verify OTP"}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      className="w-full"
-                      onClick={handleResendOtp}
-                      disabled={resendTimer > 0 || loading}
-                    >
-                      {resendTimer > 0 ? `Resend OTP in ${resendTimer}s` : "Resend OTP"}
-                    </Button>
-                  </>
-                )}
-              </div>
-            </TabsContent>
 
             <TabsContent value="signin">
               <form onSubmit={handleEmailSignIn} className="space-y-4">
