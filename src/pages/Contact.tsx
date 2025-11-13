@@ -4,8 +4,16 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/use-toast";
-import { Mail, MessageSquare, Phone } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { Mail, MessageSquare } from "lucide-react";
+import { z } from "zod";
+
+const contactSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
+  email: z.string().trim().email("Invalid email address").max(255, "Email must be less than 255 characters"),
+  subject: z.string().trim().min(1, "Subject is required").max(200, "Subject must be less than 200 characters"),
+  message: z.string().trim().min(1, "Message is required").max(2000, "Message must be less than 2000 characters")
+});
 const Contact = () => {
   const {
     toast
@@ -18,16 +26,30 @@ const Contact = () => {
   });
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Message Sent!",
-      description: "We'll get back to you within 24 hours."
-    });
-    setFormData({
-      name: "",
-      email: "",
-      subject: "",
-      message: ""
-    });
+    
+    try {
+      contactSchema.parse(formData);
+      
+      toast({
+        title: "Message Sent!",
+        description: "We'll get back to you within 24 hours."
+      });
+      
+      setFormData({
+        name: "",
+        email: "",
+        subject: "",
+        message: ""
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation Error",
+          description: error.errors[0].message,
+          variant: "destructive"
+        });
+      }
+    }
   };
   return <div className="min-h-screen pt-24 pb-12 px-4">
       <div className="container mx-auto max-w-4xl">
