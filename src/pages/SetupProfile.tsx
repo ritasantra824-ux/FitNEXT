@@ -4,26 +4,26 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
-import { Dumbbell, Loader2, User, Calendar, Ruler, Weight } from "lucide-react";
+import { Dumbbell, Loader2, User, CalendarIcon, Ruler, Weight } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 const SetupProfile = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    day: "",
-    month: "",
-    year: "",
-    height: "",
-    weight: "",
-  });
+  const [name, setName] = useState("");
+  const [dob, setDob] = useState<Date>();
+  const [height, setHeight] = useState("");
+  const [weight, setWeight] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.day || !formData.month || !formData.year || !formData.height || !formData.weight) {
+    if (!name || !dob || !height || !weight) {
       toast({
         title: "Missing fields",
         description: "Please fill in all fields",
@@ -32,25 +32,11 @@ const SetupProfile = () => {
       return;
     }
 
-    // Validate date
-    const day = parseInt(formData.day);
-    const month = parseInt(formData.month);
-    const year = parseInt(formData.year);
-
-    if (day < 1 || day > 31 || month < 1 || month > 12 || year < 1900 || year > new Date().getFullYear()) {
-      toast({
-        title: "Invalid date",
-        description: "Please enter a valid date of birth",
-        variant: "destructive",
-      });
-      return;
-    }
-
     // Validate height and weight
-    const height = parseFloat(formData.height);
-    const weight = parseFloat(formData.weight);
+    const heightNum = parseFloat(height);
+    const weightNum = parseFloat(weight);
 
-    if (isNaN(height) || height <= 0 || isNaN(weight) || weight <= 0) {
+    if (isNaN(heightNum) || heightNum <= 0 || isNaN(weightNum) || weightNum <= 0) {
       toast({
         title: "Invalid measurements",
         description: "Please enter valid height and weight",
@@ -68,16 +54,16 @@ const SetupProfile = () => {
       }
 
       // Format date as YYYY-MM-DD
-      const dob = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+      const formattedDob = format(dob, "yyyy-MM-dd");
 
       const { error } = await supabase
         .from("profiles")
         .insert({
           id: user.id,
-          name: formData.name,
-          dob,
-          height,
-          weight,
+          name: name,
+          dob: formattedDob,
+          height: heightNum,
+          weight: weightNum,
         });
 
       if (error) throw error;
@@ -125,8 +111,8 @@ const SetupProfile = () => {
                   id="name"
                   type="text"
                   placeholder="John Doe"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   className="pl-10"
                   disabled={loading}
                 />
@@ -135,41 +121,36 @@ const SetupProfile = () => {
 
             <div className="space-y-2">
               <label className="text-sm font-medium">Date of Birth</label>
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type="number"
-                    placeholder="Day"
-                    min="1"
-                    max="31"
-                    value={formData.day}
-                    onChange={(e) => setFormData({ ...formData, day: e.target.value })}
-                    className="pl-10"
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !dob && "text-muted-foreground"
+                    )}
                     disabled={loading}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {dob ? format(dob, "PPP") : <span>Pick your date of birth</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={dob}
+                    onSelect={setDob}
+                    disabled={(date) =>
+                      date > new Date() || date < new Date("1900-01-01")
+                    }
+                    initialFocus
+                    captionLayout="dropdown-buttons"
+                    fromYear={1900}
+                    toYear={new Date().getFullYear()}
+                    className={cn("p-3 pointer-events-auto")}
                   />
-                </div>
-                <Input
-                  type="number"
-                  placeholder="Month"
-                  min="1"
-                  max="12"
-                  value={formData.month}
-                  onChange={(e) => setFormData({ ...formData, month: e.target.value })}
-                  className="flex-1"
-                  disabled={loading}
-                />
-                <Input
-                  type="number"
-                  placeholder="Year"
-                  min="1900"
-                  max={new Date().getFullYear()}
-                  value={formData.year}
-                  onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-                  className="flex-1"
-                  disabled={loading}
-                />
-              </div>
+                </PopoverContent>
+              </Popover>
             </div>
 
             <div className="space-y-2">
@@ -183,8 +164,8 @@ const SetupProfile = () => {
                   type="number"
                   placeholder="175"
                   step="0.1"
-                  value={formData.height}
-                  onChange={(e) => setFormData({ ...formData, height: e.target.value })}
+                  value={height}
+                  onChange={(e) => setHeight(e.target.value)}
                   className="pl-10"
                   disabled={loading}
                 />
@@ -202,8 +183,8 @@ const SetupProfile = () => {
                   type="number"
                   placeholder="70"
                   step="0.1"
-                  value={formData.weight}
-                  onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
+                  value={weight}
+                  onChange={(e) => setWeight(e.target.value)}
                   className="pl-10"
                   disabled={loading}
                 />
