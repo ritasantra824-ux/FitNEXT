@@ -48,17 +48,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         // Handle auth events
         if (event === 'SIGNED_IN' && currentSession?.user) {
-          // Defer profile check to avoid blocking auth state update
-          setTimeout(async () => {
-            const hasProfile = await checkProfile(currentSession.user.id);
-            
-            // Only redirect if not already on setup-profile or auth/callback
-            if (!hasProfile && location.pathname !== '/setup-profile' && location.pathname !== '/auth/callback') {
-              navigate('/setup-profile');
-            } else if (hasProfile && (location.pathname === '/login' || location.pathname === '/auth')) {
-              navigate('/');
-            }
-          }, 0);
+          // Check profile immediately after sign in
+          const hasProfile = await checkProfile(currentSession.user.id);
+          
+          // Redirect authenticated users away from login/auth pages
+          if (!hasProfile) {
+            navigate('/setup-profile');
+          } else if (location.pathname === '/login' || location.pathname === '/auth') {
+            navigate('/');
+          }
         } else if (event === 'SIGNED_OUT') {
           navigate('/login');
         }

@@ -16,51 +16,23 @@ const Auth = () => {
   const [session, setSession] = useState<any>(null);
 
   useEffect(() => {
-    // Check current session and profile
-    const checkSessionAndProfile = async () => {
+    // Check if user is already logged in and redirect
+    const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
-      
       if (session) {
-        // Check if profile exists
+        // User is authenticated, let AuthContext handle the redirect
+        // This prevents showing login page to authenticated users
         const { data: profile } = await supabase
           .from("profiles")
           .select("id")
           .eq("id", session.user.id)
           .maybeSingle();
         
-        if (profile) {
-          navigate("/");
-        } else {
-          navigate("/setup-profile");
-        }
+        navigate(profile ? "/" : "/setup-profile");
       }
     };
 
-    checkSessionAndProfile();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      if (session) {
-        // Defer profile check to avoid blocking auth state change
-        setTimeout(async () => {
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("id")
-            .eq("id", session.user.id)
-            .maybeSingle();
-          
-          if (profile) {
-            navigate("/");
-          } else {
-            navigate("/setup-profile");
-          }
-        }, 0);
-      }
-    });
-
-    return () => subscription.unsubscribe();
+    checkSession();
   }, [navigate]);
 
 
