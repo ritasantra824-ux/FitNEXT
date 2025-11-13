@@ -514,22 +514,22 @@ const Meals = () => {
         </div>
 
         <Tabs defaultValue="weightloss" className="w-full">
-          <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-4 mb-8">
-            <TabsTrigger value="weightloss" className="flex items-center gap-2">
-              <TrendingDown className="w-4 h-4" />
-              Weight Loss
+          <TabsList className="w-full max-w-4xl mx-auto mb-8 h-auto flex-col sm:flex-row sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-2 p-2">
+            <TabsTrigger value="weightloss" className="flex items-center justify-center gap-2 w-full px-4 py-3">
+              <TrendingDown className="w-4 h-4 flex-shrink-0" />
+              <span className="whitespace-nowrap">Weight Loss</span>
             </TabsTrigger>
-            <TabsTrigger value="musclegain" className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4" />
-              Muscle Gain
+            <TabsTrigger value="musclegain" className="flex items-center justify-center gap-2 w-full px-4 py-3">
+              <TrendingUp className="w-4 h-4 flex-shrink-0" />
+              <span className="whitespace-nowrap">Muscle Gain</span>
             </TabsTrigger>
-            <TabsTrigger value="weightloss-indian" className="flex items-center gap-2">
-              <TrendingDown className="w-4 h-4" />
-              Indian Weight Loss
+            <TabsTrigger value="weightloss-indian" className="flex items-center justify-center gap-2 w-full px-4 py-3">
+              <TrendingDown className="w-4 h-4 flex-shrink-0" />
+              <span className="whitespace-nowrap">Indian Weight Loss</span>
             </TabsTrigger>
-            <TabsTrigger value="musclegain-indian" className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4" />
-              Indian Muscle Gain
+            <TabsTrigger value="musclegain-indian" className="flex items-center justify-center gap-2 w-full px-4 py-3">
+              <TrendingUp className="w-4 h-4 flex-shrink-0" />
+              <span className="whitespace-nowrap">Indian Muscle Gain</span>
             </TabsTrigger>
           </TabsList>
 
