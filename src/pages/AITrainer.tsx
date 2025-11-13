@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,10 +14,20 @@ interface Message {
 
 const AITrainer = () => {
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
+  const mode = searchParams.get('mode');
+  
+  const getInitialMessage = () => {
+    if (mode === 'meal-plan') {
+      return "Hi! I'm your AI nutrition advisor. I'll help you create a personalized meal plan. To get started, please tell me:\n\n1. Your daily calorie requirement (or your goal: weight loss, maintenance, or muscle gain)\n2. Any dietary preferences or restrictions\n3. Your preferred cuisine style (Western, Indian, Mediterranean, etc.)\n\nWhat are your nutritional goals?";
+    }
+    return "Hi! I'm your AI fitness trainer. I can help you with workout advice, nutrition questions, form tips, and motivation. What would you like to know?";
+  };
+
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Hi! I'm your AI fitness trainer. I can help you with workout advice, nutrition questions, form tips, and motivation. What would you like to know?",
+      content: getInitialMessage(),
     },
   ]);
   const [input, setInput] = useState("");
@@ -52,7 +63,10 @@ const AITrainer = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke("ai-trainer", {
-        body: { message: trimmedInput },
+        body: { 
+          message: trimmedInput,
+          mode: mode || 'general'
+        },
       });
 
       if (error) {

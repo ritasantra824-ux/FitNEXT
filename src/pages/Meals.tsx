@@ -624,7 +624,11 @@ const Meals = () => {
             <p className="text-white/90 mb-6">
               Get custom nutrition plans tailored to your body type, goals, and dietary preferences
             </p>
-            <Button variant="secondary" size="lg">
+            <Button 
+              variant="secondary" 
+              size="lg"
+              onClick={() => navigate('/ai-trainer?mode=meal-plan')}
+            >
               Get Custom Plan
             </Button>
           </Card>
