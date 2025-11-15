@@ -51,7 +51,7 @@ const Signup = () => {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: "https://fitnext.lovable.app/auth/callback",
         },
       });
 
@@ -78,7 +78,7 @@ const Signup = () => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: "https://fitnext.lovable.app/auth/callback",
         },
       });
 
