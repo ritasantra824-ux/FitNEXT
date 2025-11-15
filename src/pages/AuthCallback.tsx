@@ -20,18 +20,8 @@ const AuthCallback = () => {
         }
 
         if (session) {
-          // Check if user has a profile
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('id')
-            .eq('id', session.user.id)
-            .maybeSingle();
-
-          if (!profile) {
-            navigate('/setup-profile');
-          } else {
-            navigate('/');
-          }
+          // Redirect to profile page after successful authentication
+          navigate('/profile');
         } else {
           navigate('/login');
         }
