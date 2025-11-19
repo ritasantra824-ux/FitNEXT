@@ -1,7 +1,8 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Dumbbell, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import logo from "@/assets/fitnext-logo.png";
 
 const Navigation = () => {
   const location = useLocation();
@@ -28,9 +29,13 @@ const Navigation = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2 font-bold text-xl">
-            <Dumbbell className="w-6 h-6 text-primary" />
-            <span className="bg-gradient-primary bg-clip-text text-transparent">FitNEXT</span>
+          <Link to="/" className="flex items-center">
+            <img 
+              src={logo} 
+              alt="FitNEXT" 
+              className="h-10 w-auto brightness-0 invert"
+              style={{ filter: 'brightness(0) saturate(100%) invert(56%) sepia(95%) saturate(1442%) hue-rotate(101deg) brightness(93%) contrast(89%)' }}
+            />
           </Link>
 
           {/* Desktop Navigation */}
