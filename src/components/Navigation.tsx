@@ -1,11 +1,47 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "../integrations/supabase/client";
 
 const Navigation = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const [user, setUser] = useState<any>(null);
+  const [initial, setInitial] = useState<string>("?");
+
+  // Load user session + profile initial
+  useEffect(() => {
+    let mounted = true;
+
+    (async () => {
+      const { data: userData } = await supabase.auth.getUser();
+      const authUser = userData?.user;
+      if (!authUser || !mounted) {
+        setUser(null);
+        return;
+      }
+
+      setUser(authUser);
+
+      // Fetch name to display initial
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("name")
+        .eq("id", authUser.id)
+        .single();
+
+      if (profile?.name) {
+        setInitial(profile.name[0].toUpperCase());
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, [location.pathname]);
 
   const navItems = [
     { path: "/", label: "Home" },
@@ -19,7 +55,7 @@ const Navigation = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
-  // Hide navbar on auth pages  
+  // Hide navbar on pages where we don't want distractions
   if (
     location.pathname === "/login" ||
     location.pathname === "/signup" ||
@@ -34,19 +70,18 @@ const Navigation = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
 
-          {/* FIXED LOGO — no nested Link */}
+          {/* LOGO */}
           <Link to="/" className="flex items-center">
-  <img
-    src="/logo.png.png"
-    alt="FitNEXT Logo"
-    className="h-28 w-auto object-contain"
-    style={{
-      filter:
-        "brightness(0%) saturate(100%) invert(56%) sepia(95%) saturate(1442%) hue-rotate(101deg) brightness(93%) contrast(89%)",
-    }}
-  />
-</Link>
-
+            <img
+              src="/logo.png.png"
+              alt="FitNEXT Logo"
+              className="h-28 w-auto object-contain"
+              style={{
+                filter:
+                  "brightness(0%) saturate(100%) invert(56%) sepia(95%) saturate(1442%) hue-rotate(101deg) brightness(93%) contrast(89%)",
+              }}
+            />
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">
@@ -64,6 +99,49 @@ const Navigation = () => {
                 </Button>
               </Link>
             ))}
+
+            {/* Right-side auth section */}
+            {!user ? (
+              <Link to="/login">
+                <Button className="ml-2">Login</Button>
+              </Link>
+            ) : (
+              <div className="ml-4 relative group">
+                <div
+                  onClick={() => navigate("/profile")}
+                  className="w-10 h-10 bg-primary text-white font-semibold rounded-full flex items-center justify-center cursor-pointer"
+                >
+                  {initial}
+                </div>
+
+                {/* Dropdown */}
+                <div className="hidden group-hover:block absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md border">
+                  <button
+                    className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                    onClick={() => navigate("/profile")}
+                  >
+                    Profile
+                  </button>
+
+                  <button
+                    className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                    onClick={() => navigate("/setup-profile")}
+                  >
+                    Edit Profile
+                  </button>
+
+                  <button
+                    className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100"
+                    onClick={async () => {
+                      await supabase.auth.signOut();
+                      navigate("/login");
+                    }}
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -101,6 +179,40 @@ const Navigation = () => {
                   </Button>
                 </Link>
               ))}
+
+              {/* Mobile login/logout */}
+              {!user ? (
+                <Link
+                  to="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Button className="w-full mt-2">Login</Button>
+                </Link>
+              ) : (
+                <>
+                  <Button
+                    className="w-full mt-2"
+                    onClick={() => {
+                      navigate("/profile");
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    Profile
+                  </Button>
+
+                  <Button
+                    className="w-full mt-1 text-red-600"
+                    variant="ghost"
+                    onClick={async () => {
+                      await supabase.auth.signOut();
+                      setMobileMenuOpen(false);
+                      navigate("/login");
+                    }}
+                  >
+                    Logout
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         )}
@@ -110,4 +222,3 @@ const Navigation = () => {
 };
 
 export default Navigation;
-

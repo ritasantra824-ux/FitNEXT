@@ -51,7 +51,7 @@ const Signup = () => {
         email,
         password,
         options: {
-          emailRedirectTo: "https://fitnext.lovable.app/auth/callback",
+          emailRedirectTo: "http://localhost:8080/auth/callback",
         },
       });
 
