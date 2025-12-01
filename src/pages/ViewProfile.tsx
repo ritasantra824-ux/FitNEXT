@@ -5,38 +5,50 @@ import ProfileCard from "../components/ProfileCard";
 
 export default function ViewProfile() {
   const navigate = useNavigate();
+  // Using explicit type or any to match your preference; adding strict null checks
   const [profile, setProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let mounted = true;
 
-    (async () => {
-      const { data: userData } = await supabase.auth.getUser();
-      const user = userData?.user;
+    const fetchProfile = async () => {
+      try {
+        setLoading(true);
+        // 1. Get current user
+        const { data: userData } = await supabase.auth.getUser();
+        const user = userData?.user;
 
-      if (!user) {
-        navigate("/login");
-        return;
+        if (!user) {
+          if (mounted) navigate("/login");
+          return;
+        }
+
+        // 2. Fetch profile
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .maybeSingle(); // Use maybeSingle to prevent 406 errors if 0 rows
+
+        // If error or no data, redirect to setup
+        if (error || !data) {
+          console.log("No profile found or error:", error);
+          if (mounted) navigate("/setup-profile");
+          return;
+        }
+
+        if (mounted) {
+          setProfile(data);
+        }
+      } catch (error) {
+        console.error("Unexpected error in ViewProfile:", error);
+      } finally {
+        if (mounted) setLoading(false);
       }
+    };
 
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-
-      // If error (no profile) → send to setup
-      if (error || !data) {
-        navigate("/setup-profile");
-        return;
-      }
-
-      if (!mounted) return;
-
-      setProfile(data);
-      setLoading(false);
-    })();
+    fetchProfile();
 
     return () => {
       mounted = false;
@@ -44,77 +56,92 @@ export default function ViewProfile() {
   }, [navigate]);
 
   const handleDelete = async () => {
-    if (!confirm("Delete your account permanently?")) return;
+    if (!window.confirm("Delete your account permanently?")) return;
 
-    const { data: userData } = await supabase.auth.getUser();
-    const user = userData?.user;
-    const token = (userData as any)?.session?.access_token;
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      const user = userData?.user;
+      const token = (userData as any)?.session?.access_token;
 
-    if (!user) return;
+      if (!user) return;
 
-    // 1. Delete profile row
-    await supabase.from("profiles").delete().eq("id", user.id);
+      // 1. Delete profile row
+      const { error } = await supabase.from("profiles").delete().eq("id", user.id);
+      if (error) {
+        throw error;
+      }
 
-    // 2. Call Edge Function (optional but recommended)
-    const fnUrl = import.meta.env.VITE_DELETE_USER_FN;
-    if (fnUrl) {
-      await fetch(fnUrl, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      // 2. Call Edge Function (optional but recommended)
+      const fnUrl = import.meta.env.VITE_DELETE_USER_FN;
+      if (fnUrl) {
+        await fetch(fnUrl, {
+          method: "POST",
+          headers: { 
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          },
+        });
+      }
+
+      // 3. Log out and redirect
+      await supabase.auth.signOut();
+      navigate("/login");
+      
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      alert("Failed to delete account. Please try again.");
     }
-
-    // 3. Log out
-    await supabase.auth.signOut();
-    navigate("/login");
   };
 
   if (loading) return <div className="p-6">Loading...</div>;
+  
+  // If not loading and no profile, we likely redirected, but return null to be safe
   if (!profile) return null;
 
   return (
     <div className="max-w-xl mx-auto p-6">
       <div className="flex items-center gap-4">
-        <ProfileCard name={profile.name} size={80} />
+        {/* Ensure ProfileCard handles missing name gracefully if needed */}
+        <ProfileCard name={profile.name || "User"} size={80} />
         <div>
-          <h1 className="text-2xl font-semibold">{profile.name}</h1>
+          <h1 className="text-2xl font-semibold">{profile.name || "Unnamed User"}</h1>
           <p className="text-sm text-gray-500 font-mono">{profile.id}</p>
         </div>
       </div>
 
       <div className="mt-6 grid gap-4">
         <div className="p-4 border rounded">
-          <div className="text-sm text-gray-500">DOB (DDMMYY)</div>
-          <div className="text-lg">{profile.dob}</div>
+          <div className="text-sm text-gray-500">DOB (YYYY-MM-DD)</div>
+          <div className="text-lg">{profile.dob || "Not set"}</div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div className="p-4 border rounded">
             <div className="text-sm text-gray-500">Height</div>
-            <div className="text-lg">{profile.height} cm</div>
+            <div className="text-lg">{profile.height ? `${profile.height} cm` : "Not set"}</div>
           </div>
 
           <div className="p-4 border rounded">
             <div className="text-sm text-gray-500">Weight</div>
-            <div className="text-lg">{profile.weight} kg</div>
+            <div className="text-lg">{profile.weight ? `${profile.weight} kg` : "Not set"}</div>
           </div>
         </div>
 
         <div className="flex gap-3">
           <button
             onClick={() => navigate("/setup-profile")}
-            className="px-4 py-2 rounded bg-slate-800 text-white"
+            className="px-4 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 transition-colors"
           >
             Edit Profile
           </button>
 
-          <Link to="/information" className="px-4 py-2 rounded border">
+          <Link to="/information" className="px-4 py-2 rounded border hover:bg-gray-50 transition-colors">
             Information
           </Link>
 
           <button
             onClick={handleDelete}
-            className="ml-auto px-4 py-2 rounded bg-red-600 text-white"
+            className="ml-auto px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 transition-colors"
           >
             Delete
           </button>
