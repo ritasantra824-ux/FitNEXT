@@ -115,23 +115,23 @@ const Navigation = () => {
                 </div>
 
                 {/* Dropdown */}
-                <div className="hidden group-hover:block absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md border">
+                <div className="hidden group-hover:block absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md border z-50">
                   <button
-                    className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                    className="w-full text-left px-4 py-2 text-gray-900 hover:bg-gray-100"
                     onClick={() => navigate("/profile")}
                   >
                     Profile
                   </button>
 
                   <button
-                    className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                    className="w-full text-left px-4 py-2 text-gray-900 hover:bg-gray-100"
                     onClick={() => navigate("/setup-profile")}
                   >
                     Edit Profile
                   </button>
 
                   <button
-                    className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100"
+                    className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50"
                     onClick={async () => {
                       await supabase.auth.signOut();
                       navigate("/login");
