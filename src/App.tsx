@@ -21,6 +21,8 @@ import AuthCallback from "./pages/AuthCallback";
 
 import SetupProfile from "./pages/SetupProfile";
 import ViewProfile from "./pages/ViewProfile";
+import Information from "./pages/Information";
+
 
 import NotFound from "./pages/NotFound";
 
@@ -45,6 +47,7 @@ const App = () => (
           {/* PROFILE SYSTEM */}
           <Route path="/setup-profile" element={<SetupProfile />} />
           <Route path="/profile" element={<ViewProfile />} />
+          <Route path="/information" element={<Information />} />
 
           {/* PUBLIC PAGES */}
           <Route path="/" element={<Home />} />
