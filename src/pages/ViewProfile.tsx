@@ -93,49 +93,50 @@ export default function ViewProfile() {
     }
   };
 
-  if (loading) return <div className="p-6">Loading...</div>;
+  if (loading) return <div className="p-6 pt-24 text-white">Loading...</div>;
   
   // If not loading and no profile, we likely redirected, but return null to be safe
   if (!profile) return null;
 
   return (
-    <div className="max-w-xl mx-auto p-6">
+    // ADDED: pt-24 (padding-top) to clear navbar, min-h-screen for height
+    <div className="min-h-screen pt-24 pb-12 px-6 max-w-xl mx-auto">
       <div className="flex items-center gap-4">
         {/* Ensure ProfileCard handles missing name gracefully if needed */}
         <ProfileCard name={profile.name || "User"} size={80} />
         <div>
-          <h1 className="text-2xl font-semibold">{profile.name || "Unnamed User"}</h1>
+          <h1 className="text-2xl font-semibold text-white">{profile.name || "Unnamed User"}</h1>
           <p className="text-sm text-gray-500 font-mono">{profile.id}</p>
         </div>
       </div>
 
       <div className="mt-6 grid gap-4">
-        <div className="p-4 border rounded">
-          <div className="text-sm text-gray-500">DOB (YYYY-MM-DD)</div>
-          <div className="text-lg">{profile.dob || "Not set"}</div>
+        <div className="p-4 border border-gray-700 rounded bg-gray-900">
+          <div className="text-sm text-gray-500">DOB (DDMMYY)</div>
+          <div className="text-lg text-white">{profile.dob || "Not set"}</div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <div className="p-4 border rounded">
+          <div className="p-4 border border-gray-700 rounded bg-gray-900">
             <div className="text-sm text-gray-500">Height</div>
-            <div className="text-lg">{profile.height ? `${profile.height} cm` : "Not set"}</div>
+            <div className="text-lg text-white">{profile.height ? `${profile.height} cm` : "Not set"}</div>
           </div>
 
-          <div className="p-4 border rounded">
+          <div className="p-4 border border-gray-700 rounded bg-gray-900">
             <div className="text-sm text-gray-500">Weight</div>
-            <div className="text-lg">{profile.weight ? `${profile.weight} kg` : "Not set"}</div>
+            <div className="text-lg text-white">{profile.weight ? `${profile.weight} kg` : "Not set"}</div>
           </div>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex gap-3 mt-4">
           <button
             onClick={() => navigate("/setup-profile")}
-            className="px-4 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 transition-colors"
+            className="px-4 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 transition-colors border border-slate-600"
           >
             Edit Profile
           </button>
 
-          <Link to="/information" className="px-4 py-2 rounded border hover:bg-gray-50 transition-colors">
+          <Link to="/information" className="px-4 py-2 rounded border border-gray-600 text-white hover:bg-gray-800 transition-colors">
             Information
           </Link>
 
