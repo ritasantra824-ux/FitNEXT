@@ -88,19 +88,20 @@ export default function SetupProfile() {
     navigate("/profile");
   }
 
-  if (loading) return <div className="p-8 text-center">Loading...</div>;
+  if (loading) return <div className="p-8 text-center text-white">Loading...</div>;
 
   return (
     <div className="max-w-xl mx-auto p-6">
-      <h1 className="text-2xl font-semibold mb-4">
+      <h1 className="text-2xl font-semibold mb-4 text-white">
         {isExisting ? "Edit Profile" : "Setup Profile"}
       </h1>
 
       <div className="space-y-4">
         <label className="block">
-          <span className="text-sm text-slate-600">Full Name</span>
+          <span className="text-sm text-gray-300">Full Name</span>
+          {/* ADDED: text-black bg-white to ensure visibility */}
           <input
-            className="w-full border px-3 py-2 rounded-md mt-1"
+            className="w-full border px-3 py-2 rounded-md mt-1 text-black bg-white"
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="John Doe"
@@ -108,9 +109,9 @@ export default function SetupProfile() {
         </label>
 
         <label className="block">
-          <span className="text-sm text-slate-600">DOB (DDMMYY)</span>
+          <span className="text-sm text-gray-300">DOB (DDMMYY)</span>
           <input
-            className="w-full border px-3 py-2 rounded-md mt-1"
+            className="w-full border px-3 py-2 rounded-md mt-1 text-black bg-white"
             value={dob}
             onChange={(e) =>
               setDob(e.target.value.replace(/\D/g, "").slice(0, 6))
@@ -122,9 +123,9 @@ export default function SetupProfile() {
 
         <div className="grid grid-cols-2 gap-4">
           <label className="block">
-            <span className="text-sm text-slate-600">Height (cm)</span>
+            <span className="text-sm text-gray-300">Height (cm)</span>
             <input
-              className="w-full border px-3 py-2 rounded-md mt-1"
+              className="w-full border px-3 py-2 rounded-md mt-1 text-black bg-white"
               type="number"
               value={height}
               onChange={(e) => setHeight(e.target.value)}
@@ -133,9 +134,9 @@ export default function SetupProfile() {
           </label>
 
           <label className="block">
-            <span className="text-sm text-slate-600">Weight (kg)</span>
+            <span className="text-sm text-gray-300">Weight (kg)</span>
             <input
-              className="w-full border px-3 py-2 rounded-md mt-1"
+              className="w-full border px-3 py-2 rounded-md mt-1 text-black bg-white"
               type="number"
               value={weight}
               onChange={(e) => setWeight(e.target.value)}
@@ -146,7 +147,7 @@ export default function SetupProfile() {
 
         <button
           onClick={handleSave}
-          className="w-full bg-emerald-600 text-white py-2 rounded-md mt-4"
+          className="w-full bg-emerald-600 text-white py-2 rounded-md mt-4 hover:bg-emerald-700 transition-colors"
         >
           {isExisting ? "Update Profile" : "Save Profile"}
         </button>
